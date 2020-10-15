@@ -21,12 +21,6 @@ activityLabels <- read.table("UCI HAR Dataset/activity_labels.txt")
 featureLabels <- read.table("UCI HAR Dataset/features.txt")
 colnames(activityLabels) <- c("activity","activityLabel")
 
-# load train data and create single table
-#trainData <- read.table("UCI HAR Dataset/train/X_train.txt")
-#trainActivity <- read.table("UCI HAR Dataset/train/Y_train.txt")
-#trainSubjects <- read.table("UCI HAR Dataset/train/subject_train.txt")
-#train <- cbind(trainSubjects,trainActivity,trainData)
-
 # load test data
 testData <- read.table("UCI HAR Dataset/test/X_test.txt")
 # add column names
