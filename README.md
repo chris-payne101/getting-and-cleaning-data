@@ -25,8 +25,13 @@ The run_analysis.R code performs the follwoing actions
 3. Checks the existance of the Data.zip file and downloads if not found
 4. Unzips the Data.zip file if the UCI HAR Dataet directory is missing
 5. Load the activity_labels.txt and features.txt files into data frames, applying a column name to the activityLabels table
-6. LOads a dataset (this activity is repeated for both test and train) and applies the column labels as loaded in previous set
+6. Loads a dataset (this activity is repeated for both test and train) and applies the column labels as loaded in previous set
 7. Removes columns from the dataset by grepping on column name
-8. Loads activity type for the dataset and applies a column name
+8. Loads activity type for the dataset, applies a column name and replaces the type with the descriptive name
 9. Loads subject id for the data set and applies column name
 10. Merges the dataset with it's activity type and subject id
+11. Activity repeated for other dataset
+12. Datasets (train and test) merged
+13. subject and activity columns are made factors of the dataset
+14. Meld and cast operations are performed on the dataset to produce a dataset with the average of each variable for each activity and each subject
+15. The 'tidy' dataset is written out to a file called tidy.txt
