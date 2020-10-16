@@ -17,58 +17,46 @@ if (!file.exists("UCI HAR Dataset")) {
 }
 
 # load activity and feature labels
-activityLabels <- read.table("UCI HAR Dataset/activity_labels.txt")
-featureLabels <- read.table("UCI HAR Dataset/features.txt")
-colnames(activityLabels) <- c("activity","activityLabel")
+activityLabels <- read.table("UCI HAR Dataset/activity_labels.txt",header=FALSE,col.names = c("activity","activityLabel"))
+featureLabels <- read.table("UCI HAR Dataset/features.txt",header=FALSE)
+featureLabels[,2] <- gsub('[-()]', '',featureLabels[,2])
 
-# load test data
-testData <- read.table("UCI HAR Dataset/test/X_test.txt")
-# add column names
-colnames(testData) <- c(featureLabels[,2])
-# remove unwanted columns
-testData <- testData[ , names(testData) %in% featureLabels[grep(".*mean.*|.*std.*",featureLabels[,2]),2]]
+# Create combined data set
+# load test data and remove unwanted columns
+testData <- read.table("UCI HAR Dataset/test/X_test.txt",header = FALSE, col.names = c(featureLabels[,2]) )
+testData <- testData[ , names(testData) %in% featureLabels[grepl("mean|std",featureLabels[,2]),2]]
+
 # load activity type
-testActivity <- read.table("UCI HAR Dataset/test/Y_test.txt")
-# add column name
-colnames(testActivity) <- c("activity")
-# replace activity id with label
-testActivity <- merge(testActivity,activityLabels,by="activity")
+testActivity <- read.table("UCI HAR Dataset/test/Y_test.txt", header = FALSE, col.names = c("activity"))
+
 # load subjects
-testSubjects <- read.table("UCI HAR Dataset/test/subject_test.txt")
-# add column name
-colnames(testSubjects) <- c("subject")
+testSubjects <- read.table("UCI HAR Dataset/test/subject_test.txt",header=FALSE, col.names = c("subject"))
+
 # merge data into single table
+testActivity <- merge(testActivity,activityLabels, by="activity",all.x=TRUE)
 test <- cbind(testSubjects,activity = testActivity[,2],testData)
 
-# load train data
-trainData <- read.table("UCI HAR Dataset/train/X_train.txt")
-# add column names
-colnames(trainData) <- c(featureLabels[,2])
-# remove unwanted columns
-trainData <- trainData[ , names(trainData) %in% featureLabels[grep(".*mean.*|.*std.*",featureLabels[,2]),2]]
+# load train data and remove unwanted columns
+trainData <- read.table("UCI HAR Dataset/train/X_train.txt", header=FALSE, col.names = c(featureLabels[,2]))
+trainData <- trainData[ , names(trainData) %in% featureLabels[grepl("mean|std",featureLabels[,2]),2]]
+
 # load activity type
-trainActivity <- read.table("UCI HAR Dataset/train/Y_train.txt")
-# add column name
-colnames(trainActivity) <- c("activity")
-# replace activity id with label
-trainActivity <- merge(trainActivity,activityLabels,by="activity")
+trainActivity <- read.table("UCI HAR Dataset/train/Y_train.txt", header=FALSE, col.names = c("activity"))
+
 # load subjects
-trainSubjects <- read.table("UCI HAR Dataset/train/subject_train.txt")
-# add column name
-colnames(trainSubjects) <- c("subject")
-# merge data into single table
+trainSubjects <- read.table("UCI HAR Dataset/train/subject_train.txt", header = FALSE, col.names = c("subject"))
+
+# change activity ID for activity description 
+# and merge data into single table
+trainActivity <- merge(trainActivity,activityLabels, by="activity",all.x=TRUE)
 train <- cbind(trainSubjects,activity = trainActivity[,2],trainData)
 
-
-# merge data sets and add labels
+# merge data sets 
 mergedData <- rbind(train,test)
 
-# turn activities and subjects into factors
-mergedData$subject <- as.factor(mergedData$subject)
-mergedData$activity <- as.factor(mergedData$activity)
-
-# apply melt function and calculate means
-tidy <- dcast(melt(mergedData, id = c("subject","activity")), subject + activity ~ variable, mean)
+# apply melt function and cast
+meltedData <- melt(mergedData, id = c("subject","activity"))
+tidy <- dcast(meltedData, subject+activity~variable, mean)
 
 # save out datafile as tidy.txt
 write.table(tidy,"tidy.txt",row.names=FALSE,quote=FALSE)
